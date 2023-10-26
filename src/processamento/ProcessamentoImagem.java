@@ -7,18 +7,111 @@ package processamento;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import static java.lang.Math.sqrt;
 import static java.lang.Math.pow;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Stack;
+import javax.imageio.ImageIO;
 
 /**
  *
- * @author lucas
+ * @author Álef e Ketson
  */
 public class ProcessamentoImagem {
     
+    public static BufferedImage rednessDetection1(BufferedImage img) {
+        
+        // Carregar a imagem
+        BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+
+        double maiorCol = -Double.MAX_VALUE;
+        double menorCol = Double.MAX_VALUE;
+        
+        // Defina um limite para considerar apenas os tons de vermelho na imagem
+        double limiarVermelho = 100.0;
+
+        for (int i = 0; i < img.getWidth(); i++) {
+            for (int j = 0; j < img.getHeight(); j++) {
+                Color pixelColor = new Color(img.getRGB(i, j));
+
+                int canalVermelho = pixelColor.getRed();
+                int canalVerde = pixelColor.getGreen();
+                int canalAzul = pixelColor.getBlue();
+
+                double intensidadeVermelha = canalVermelho - 0.5 * canalVerde - 0.5 * canalAzul;
+                double intensidadeNormalizada = (intensidadeVermelha - (-255.0)) / (255.0 - (-255.0));
+
+                if (intensidadeNormalizada > 1.0) {
+                    intensidadeNormalizada = 1.0;
+                } else if (intensidadeNormalizada < 0.0) {
+                    intensidadeNormalizada = 0.0;
+                }
+
+                int corNorm = (int) (intensidadeNormalizada * 255);
+                //System.out.println(corNorm);
+
+                Color novoPixel = new Color(corNorm, corNorm, corNorm);
+                res.setRGB(i, j, novoPixel.getRGB());
+
+                if (intensidadeNormalizada > maiorCol) maiorCol = intensidadeNormalizada;
+                if (intensidadeNormalizada < menorCol) menorCol = intensidadeNormalizada;
+            }
+        }
+
+        for (int i = 0; i < img.getWidth(); i++) {
+            for (int j = 0; j < img.getHeight(); j++) {
+                int corNorm = res.getRGB(i, j);
+                double intensidade = (corNorm >> 16) & 0xFF;
+                /*intensidade = normalizacao(intensidade, menorCol * 255, maiorCol * 255, 0, 255);
+                //System.out.println(intensidade);
+                //Color novoPixel = new Color((float)intensidade, (float)intensidade, (float)intensidade);
+                //res.setRGB(i, j, novoPixel.getRGB());*/
+                
+                double cor_norm = normalizacao(intensidade, menorCol * 255, maiorCol * 255, 0, 255);
+                //System.out.println(cor_norm);
+                Color atual = new Color((int) cor_norm, (int) cor_norm, (int) cor_norm);
+                res.setRGB(i, j, atual.getRGB());
+            }
+        }
+
+        return res;
+    }
+    
+    public static BufferedImage rednessDetection2(BufferedImage originalImage) {
+        int width = originalImage.getWidth();
+        int height = originalImage.getHeight();
+
+        BufferedImage grayAndBlackImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int rgb = originalImage.getRGB(x, y);
+
+                // Extrai os componentes de cor
+                int red = (rgb >> 16) & 0xFF;
+                int green = (rgb >> 8) & 0xFF;
+                int blue = rgb & 0xFF;
+
+                // Verifica se a cor é vermelha
+                if (red > 150 && green < 100 && blue < 100) {
+                    // Converte para cinza
+                    int grayValue = (red + green + blue) / 3;
+                    int newRgb = (grayValue << 16) | (grayValue << 8) | grayValue;
+                    grayAndBlackImage.setRGB(x, y, newRgb);
+                } else {
+                    // Converte para preto
+                    grayAndBlackImage.setRGB(x, y, 0x000000); // Cor preta em RGB
+                }
+            }
+        }
+
+        return grayAndBlackImage;
+    }
+    
+    // 
     public static BufferedImage detectarPeleHumana(BufferedImage img){
         
         BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
@@ -69,12 +162,14 @@ public class ProcessamentoImagem {
         return res;
     } 
     
-    //Normalizacao em níveis de cinza para a imagem
+    // Normalizacao em níveis de cinza para a imagem
     private static double normalizacao(double hist, double min_hist, double max_hist, double min_index, double max_index){
+        hist = Math.max(min_hist, Math.min(max_hist, hist));
         //A equação de normalização disposta no conteúdo teórico
         return (max_index - min_index)*(hist - min_hist)/(max_hist - min_hist) + min_index;
     }
     
+    // 
     public static BufferedImage BinarizacaoOtsu(BufferedImage img) {
 	
 	 //Cria a  imagem  de sai­da  
@@ -176,6 +271,8 @@ public class ProcessamentoImagem {
     return res;
 
 }
+    
+    // 
     public static BufferedImage EntropiaPun(BufferedImage img) {
 	
 	 //Cria a  imagem  de sai­da  
@@ -306,6 +403,7 @@ public class ProcessamentoImagem {
     return res;
 
 }
+    
     // Código de conversão  usando sRGB e não diretamente RGB
     private static double[] RGBtoLab(BufferedImage img, int image_x, int image_y){ 
 

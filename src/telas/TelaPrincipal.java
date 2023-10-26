@@ -423,7 +423,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
             }
         }else{
             JOptionPane.showMessageDialog(f, "A imagem não foi carregada!", "Aviso", JOptionPane.WARNING_MESSAGE);
-        }        
+        }
     }//GEN-LAST:event_jMenuItem18ActionPerformed
 
     private void jMenuItem20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem20ActionPerformed
@@ -494,7 +494,23 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem11ActionPerformed
 
     private void jMenuItem26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem26ActionPerformed
-        // TODO add your handling code here:
+        JFrame f=new JFrame();
+        if(imagemFoiCarregada){
+            try{
+                BufferedImage imagemPosterizada = ProcessamentoImagem.rednessDetection1(imagemAtual);
+                if(imagemPosterizada == null) {
+                    JOptionPane.showMessageDialog(f, "Não foi possível realizar a posterizacão!", "Aviso", JOptionPane.WARNING_MESSAGE);
+                }else{
+                    imagemAtual = imagemPosterizada;
+                    jLabel1.setIcon(new javax.swing.ImageIcon(imagemAtual));
+                }
+            }catch( NullPointerException | IllegalArgumentException ex){
+                JOptionPane.showMessageDialog(f, "Não foi possível realizar a posterizacão!", "Aviso", JOptionPane.WARNING_MESSAGE);
+                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            JOptionPane.showMessageDialog(f, "A imagem não foi carregada!", "Aviso", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_jMenuItem26ActionPerformed
 
     private void jMenuItem27ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem27ActionPerformed
@@ -502,7 +518,23 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem27ActionPerformed
 
     private void jMenuItem28ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem28ActionPerformed
-        // TODO add your handling code here:
+        JFrame f=new JFrame();
+        if(imagemFoiCarregada){
+            try{
+                BufferedImage imagemPosterizada = ProcessamentoImagem.rednessDetection2(imagemAtual);
+                if(imagemPosterizada == null) {
+                    JOptionPane.showMessageDialog(f, "Não foi possível realizar a posterizacão!", "Aviso", JOptionPane.WARNING_MESSAGE);
+                }else{
+                    imagemAtual = imagemPosterizada;
+                    jLabel1.setIcon(new javax.swing.ImageIcon(imagemAtual));
+                }
+            }catch( NullPointerException | IllegalArgumentException ex){
+                JOptionPane.showMessageDialog(f, "Não foi possível realizar a posterizacão!", "Aviso", JOptionPane.WARNING_MESSAGE);
+                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            JOptionPane.showMessageDialog(f, "A imagem não foi carregada!", "Aviso", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_jMenuItem28ActionPerformed
 
     private void jMenuItem29ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem29ActionPerformed
