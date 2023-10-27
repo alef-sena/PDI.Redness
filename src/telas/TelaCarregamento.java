@@ -7,7 +7,7 @@ package telas;
 
 /**
  *
- * @author lucas
+ * @author Álef e Ketson
  */
 public class TelaCarregamento extends javax.swing.JFrame {
 

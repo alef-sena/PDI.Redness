@@ -20,7 +20,7 @@ import processamento.ProcessamentoImagem;
 
 /**
  *
- * @author lucas
+ * @author Álef e Ketson
  */
 public class TelaPrincipal extends javax.swing.JFrame {
     
@@ -58,9 +58,15 @@ public class TelaPrincipal extends javax.swing.JFrame {
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem9 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
-        jMenu5 = new javax.swing.JMenu();
-        jMenuItem18 = new javax.swing.JMenuItem();
-        jMenuItem20 = new javax.swing.JMenuItem();
+        jMenu11 = new javax.swing.JMenu();
+        jMenuItem26 = new javax.swing.JMenuItem();
+        jMenuItem27 = new javax.swing.JMenuItem();
+        jMenu12 = new javax.swing.JMenu();
+        jMenuItem28 = new javax.swing.JMenuItem();
+        jMenuItem29 = new javax.swing.JMenuItem();
+        jMenu13 = new javax.swing.JMenu();
+        jMenuItem30 = new javax.swing.JMenuItem();
+        jMenuItem31 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenu6 = new javax.swing.JMenu();
         jMenuItem6 = new javax.swing.JMenuItem();
@@ -71,15 +77,6 @@ public class TelaPrincipal extends javax.swing.JFrame {
         jMenu7 = new javax.swing.JMenu();
         jMenuItem17 = new javax.swing.JMenuItem();
         jMenuItem19 = new javax.swing.JMenuItem();
-        jMenu11 = new javax.swing.JMenu();
-        jMenuItem26 = new javax.swing.JMenuItem();
-        jMenuItem27 = new javax.swing.JMenuItem();
-        jMenu12 = new javax.swing.JMenu();
-        jMenuItem28 = new javax.swing.JMenuItem();
-        jMenuItem29 = new javax.swing.JMenuItem();
-        jMenu13 = new javax.swing.JMenu();
-        jMenuItem30 = new javax.swing.JMenuItem();
-        jMenuItem31 = new javax.swing.JMenuItem();
         jMenu14 = new javax.swing.JMenu();
         jMenuItem32 = new javax.swing.JMenuItem();
         jMenuItem33 = new javax.swing.JMenuItem();
@@ -157,25 +154,65 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu1);
 
-        jMenu5.setText("Índice de Redness");
+        jMenu11.setText("Índice de Redness - Algoritmo 1");
 
-        jMenuItem18.setText("Imagem carregada");
-        jMenuItem18.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem26.setText("Imagem carregada");
+        jMenuItem26.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem18ActionPerformed(evt);
+                jMenuItem26ActionPerformed(evt);
             }
         });
-        jMenu5.add(jMenuItem18);
+        jMenu11.add(jMenuItem26);
 
-        jMenuItem20.setText("Em lote");
-        jMenuItem20.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem27.setText("Em lote");
+        jMenuItem27.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem20ActionPerformed(evt);
+                jMenuItem27ActionPerformed(evt);
             }
         });
-        jMenu5.add(jMenuItem20);
+        jMenu11.add(jMenuItem27);
 
-        jMenuBar1.add(jMenu5);
+        jMenuBar1.add(jMenu11);
+
+        jMenu12.setText("Índice de Redness - Algoritmo 2");
+
+        jMenuItem28.setText("Imagem carregada");
+        jMenuItem28.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem28ActionPerformed(evt);
+            }
+        });
+        jMenu12.add(jMenuItem28);
+
+        jMenuItem29.setText("Em lote");
+        jMenuItem29.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem29ActionPerformed(evt);
+            }
+        });
+        jMenu12.add(jMenuItem29);
+
+        jMenuBar1.add(jMenu12);
+
+        jMenu13.setText("Índice de Redness - Fusão");
+
+        jMenuItem30.setText("Imagem carregada");
+        jMenuItem30.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem30ActionPerformed(evt);
+            }
+        });
+        jMenu13.add(jMenuItem30);
+
+        jMenuItem31.setText("Em lote");
+        jMenuItem31.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem31ActionPerformed(evt);
+            }
+        });
+        jMenu13.add(jMenuItem31);
+
+        jMenuBar1.add(jMenu13);
 
         jMenu2.setText("Técnicas de Binarização");
 
@@ -241,66 +278,6 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
-        jMenu11.setText("Índice de Redness - Algoritmo 1");
-
-        jMenuItem26.setText("Imagem carregada");
-        jMenuItem26.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem26ActionPerformed(evt);
-            }
-        });
-        jMenu11.add(jMenuItem26);
-
-        jMenuItem27.setText("Em lote");
-        jMenuItem27.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem27ActionPerformed(evt);
-            }
-        });
-        jMenu11.add(jMenuItem27);
-
-        jMenuBar1.add(jMenu11);
-
-        jMenu12.setText("Índice de Redness - Algoritmo 2");
-
-        jMenuItem28.setText("Imagem carregada");
-        jMenuItem28.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem28ActionPerformed(evt);
-            }
-        });
-        jMenu12.add(jMenuItem28);
-
-        jMenuItem29.setText("Em lote");
-        jMenuItem29.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem29ActionPerformed(evt);
-            }
-        });
-        jMenu12.add(jMenuItem29);
-
-        jMenuBar1.add(jMenu12);
-
-        jMenu13.setText("Índice de Redness - Fusão");
-
-        jMenuItem30.setText("Imagem carregada");
-        jMenuItem30.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem30ActionPerformed(evt);
-            }
-        });
-        jMenu13.add(jMenuItem30);
-
-        jMenuItem31.setText("Em lote");
-        jMenuItem31.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem31ActionPerformed(evt);
-            }
-        });
-        jMenu13.add(jMenuItem31);
-
-        jMenuBar1.add(jMenu13);
-
         jMenu14.setText("DETECÇÃO FINAL");
 
         jMenuItem32.setText("Imagem carregada");
@@ -352,7 +329,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 613, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -419,32 +396,6 @@ public class TelaPrincipal extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null, "Volte sempre!", "Mensagem", JOptionPane.INFORMATION_MESSAGE);
         System.exit(0);
     }//GEN-LAST:event_jMenuItem3ActionPerformed
-
-    private void jMenuItem18ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem18ActionPerformed
-        JFrame f=new JFrame();
-        if(imagemFoiCarregada){
-            try{
-                BufferedImage imagemPosterizada = ProcessamentoImagem.detectarPeleHumana(imagemAtual); 
-                if(imagemPosterizada == null) {
-                    JOptionPane.showMessageDialog(f, "Não foi possível realizar a posterizacão!", "Aviso", JOptionPane.WARNING_MESSAGE);
-                }else{
-                    imagemAtual = imagemPosterizada;
-                    jLabel1.setIcon(new javax.swing.ImageIcon(imagemAtual));
-                }
-            }catch( NullPointerException | IllegalArgumentException ex){
-                JOptionPane.showMessageDialog(f, "Não foi possível realizar a posterizacão!", "Aviso", JOptionPane.WARNING_MESSAGE);
-                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }else{
-            JOptionPane.showMessageDialog(f, "A imagem não foi carregada!", "Aviso", JOptionPane.WARNING_MESSAGE);
-        }
-    }//GEN-LAST:event_jMenuItem18ActionPerformed
-
-    private void jMenuItem20ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem20ActionPerformed
-        TelaDetectaPelePasta TDPP = new TelaDetectaPelePasta();
-        TDPP.setLocationRelativeTo(null);
-        TDPP.setVisible(true);
-    }//GEN-LAST:event_jMenuItem20ActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         JFrame f=new JFrame();
@@ -524,7 +475,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem26ActionPerformed
 
     private void jMenuItem27ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem27ActionPerformed
-        // TODO add your handling code here:
+        TelaDetectaVermelhoAlgoritmo1Pasta TDVA1P = new TelaDetectaVermelhoAlgoritmo1Pasta();
+        TDVA1P.setLocationRelativeTo(null);
+        TDVA1P.setVisible(true);
     }//GEN-LAST:event_jMenuItem27ActionPerformed
 
     private void jMenuItem28ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem28ActionPerformed
@@ -548,7 +501,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem28ActionPerformed
 
     private void jMenuItem29ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem29ActionPerformed
-        // TODO add your handling code here:
+        TelaDetectaVermelhoAlgoritmo2Pasta TDVA2P = new TelaDetectaVermelhoAlgoritmo2Pasta();
+        TDVA2P.setLocationRelativeTo(null);
+        TDVA2P.setVisible(true);
     }//GEN-LAST:event_jMenuItem29ActionPerformed
 
     private void jMenuItem30ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem30ActionPerformed
@@ -572,15 +527,35 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem30ActionPerformed
 
     private void jMenuItem31ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem31ActionPerformed
-        // TODO add your handling code here:
+        TelaDetectaVermelhoAlgoritmoFusaoPasta TDVAFP = new TelaDetectaVermelhoAlgoritmoFusaoPasta();
+        TDVAFP.setLocationRelativeTo(null);
+        TDVAFP.setVisible(true);
     }//GEN-LAST:event_jMenuItem31ActionPerformed
 
     private void jMenuItem32ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem32ActionPerformed
-        // TODO add your handling code here:
+        JFrame f=new JFrame();
+        if(imagemFoiCarregada){
+            try{
+                BufferedImage imagemPosterizada = ProcessamentoImagem.finalDetection(imagemAtual);
+                if(imagemPosterizada == null) {
+                    JOptionPane.showMessageDialog(f, "Não foi possível realizar a posterizacão!", "Aviso", JOptionPane.WARNING_MESSAGE);
+                }else{
+                    imagemAtual = imagemPosterizada;
+                    jLabel1.setIcon(new javax.swing.ImageIcon(imagemAtual));
+                }
+            }catch( NullPointerException | IllegalArgumentException ex){
+                JOptionPane.showMessageDialog(f, "Não foi possível realizar a posterizacão!", "Aviso", JOptionPane.WARNING_MESSAGE);
+                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            JOptionPane.showMessageDialog(f, "A imagem não foi carregada!", "Aviso", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_jMenuItem32ActionPerformed
 
     private void jMenuItem33ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem33ActionPerformed
-        // TODO add your handling code here:
+        TelaDeteccaoFinalPasta TDFP = new TelaDeteccaoFinalPasta();
+        TDFP.setLocationRelativeTo(null);
+        TDFP.setVisible(true);
     }//GEN-LAST:event_jMenuItem33ActionPerformed
 
     private void jMenuItem17ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem17ActionPerformed
@@ -604,7 +579,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem17ActionPerformed
 
     private void jMenuItem19ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem19ActionPerformed
-        // TODO add your handling code here:
+        TelaEntropiaJohannsen TEJ = new TelaEntropiaJohannsen();
+        TEJ.setLocationRelativeTo(null);
+        TEJ.setVisible(true);
     }//GEN-LAST:event_jMenuItem19ActionPerformed
 
     /**
@@ -655,7 +632,6 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
-    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenu jMenu6;
     private javax.swing.JMenu jMenu7;
     private javax.swing.JMenu jMenu9;
@@ -667,10 +643,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem14;
     private javax.swing.JMenuItem jMenuItem15;
     private javax.swing.JMenuItem jMenuItem17;
-    private javax.swing.JMenuItem jMenuItem18;
     private javax.swing.JMenuItem jMenuItem19;
     private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem20;
     private javax.swing.JMenuItem jMenuItem26;
     private javax.swing.JMenuItem jMenuItem27;
     private javax.swing.JMenuItem jMenuItem28;
