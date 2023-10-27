@@ -7,18 +7,161 @@ package processamento;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import static java.lang.Math.sqrt;
 import static java.lang.Math.pow;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Stack;
+import javax.imageio.ImageIO;
 
 /**
  *
- * @author lucas
+ * @author Álef e Ketson
+ * @link https://github.com/alef-sena/PDI.Redness
  */
 public class ProcessamentoImagem {
     
+    // 
+    public static BufferedImage rednessDetection1(BufferedImage img) {
+        
+        // Carregar a imagem
+        BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+
+        double maiorCol = -Double.MAX_VALUE;
+        double menorCol = Double.MAX_VALUE;
+        
+        for (int i = 0; i < img.getWidth(); i++) {
+            for (int j = 0; j < img.getHeight(); j++) {
+                Color pixelColor = new Color(img.getRGB(i, j));
+
+                int canalVermelho = pixelColor.getRed();
+                int canalVerde = pixelColor.getGreen();
+                int canalAzul = pixelColor.getBlue();
+
+                double intensidadeVermelha = canalVermelho - 0.5 * canalVerde - 0.5 * canalAzul;
+                double intensidadeNormalizada = (intensidadeVermelha - (-255.0)) / (255.0 - (-255.0));
+
+                if (intensidadeNormalizada > 1.0) {
+                    intensidadeNormalizada = 1.0;
+                } else if (intensidadeNormalizada < 0.0) {
+                    intensidadeNormalizada = 0.0;
+                }
+                
+                int corNorm = (int) (intensidadeNormalizada * 255);
+
+                Color novoPixel = new Color(corNorm, corNorm, corNorm);
+                res.setRGB(i, j, novoPixel.getRGB());
+
+                if (intensidadeNormalizada > maiorCol) maiorCol = intensidadeNormalizada;
+                if (intensidadeNormalizada < menorCol) menorCol = intensidadeNormalizada;
+            }
+        }
+
+        for (int i = 0; i < img.getWidth(); i++) {
+            for (int j = 0; j < img.getHeight(); j++) {
+                int corNorm = res.getRGB(i, j);
+                double intensidade = (corNorm >> 16) & 0xFF;
+        
+                /*intensidade = normalizacao(intensidade, menorCol * 255, maiorCol * 255, 0, 255);
+                //System.out.println(intensidade);
+                //Color novoPixel = new Color((float)intensidade, (float)intensidade, (float)intensidade);
+                //res.setRGB(i, j, novoPixel.getRGB());*/
+                
+                
+                double cor_norm = normalizacao(intensidade, menorCol * 255, maiorCol * 255, 0, 255);
+                //System.out.println(cor_norm);
+                Color atual = new Color((int) cor_norm, (int) cor_norm, (int) cor_norm);
+                res.setRGB(i, j, atual.getRGB());
+            }
+        }
+
+        return res;
+    }
+    
+    // 
+    public static BufferedImage rednessDetection2(BufferedImage originalImage) {
+        int width = originalImage.getWidth();
+        int height = originalImage.getHeight();
+
+        BufferedImage res = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int rgb = originalImage.getRGB(x, y);
+
+                // Extrai os componentes de cor
+                int red = (rgb >> 16) & 0xFF;
+                int green = (rgb >> 8) & 0xFF;
+                int blue = rgb & 0xFF;
+
+                // Verifica se a cor é vermelha
+                if (red > 150 && green < 100 && blue < 100) {
+                    // Converte para cinza
+                    int grayValue = (red + green + blue) / 3;
+                    int newRgb = (grayValue << 16) | (grayValue << 8) | grayValue;
+                    res.setRGB(x, y, newRgb);
+                } else {
+                    res.setRGB(x, y, 0x000000);
+                }
+            }
+        }
+
+        return res;
+    }
+    
+    //
+    public static BufferedImage rednessFusion(BufferedImage img) {
+        
+        BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+                
+        for (int i = 0; i < img.getWidth(); i++) {
+            for (int j = 0; j < img.getHeight(); j++) {
+                
+                // Algoritmo 1 - Transformar a imagem para níveis de cinza
+                double intensidadeNormalizada;
+                Color pixelColor = new Color(img.getRGB(i, j));
+
+                int canalVermelho = pixelColor.getRed();
+                int canalVerde = pixelColor.getGreen();
+                int canalAzul = pixelColor.getBlue();
+
+                double intensidadeVermelha = canalVermelho - 0.5 * canalVerde - 0.5 * canalAzul;
+                intensidadeNormalizada = (intensidadeVermelha - (-255.0)) / (255.0 - (-255.0));
+
+                if (intensidadeNormalizada > 1.0) {
+                    intensidadeNormalizada = 1.0;
+                } else if (intensidadeNormalizada < 0.0) {
+                    intensidadeNormalizada = 0.0;
+                }
+                
+                // Algoritmo 2 - Transformar a imagem para níveis de cinza
+                double pixelNormalized;
+                int rgb = img.getRGB(i, j);
+
+                // Extrai os componentes de cor
+                int red = (rgb >> 16) & 0xFF;
+                int green = (rgb >> 8) & 0xFF;
+                int blue = rgb & 0xFF;
+
+                // Verifica se a cor é vermelha
+                if (red > 150 && green < 100 && blue < 100) {
+                    // Converte para cinza
+                    int grayValue = (red + green + blue) / 3;
+                    pixelNormalized = (double) grayValue / 255.0;
+                } else {
+                    pixelNormalized = 0.0;
+                }
+                
+                res.setRGB(i, j, (int) ((intensidadeNormalizada > pixelNormalized ? intensidadeNormalizada : pixelNormalized) * 255));
+            }
+        }
+        
+        return res;
+    }
+
+    // 
     public static BufferedImage detectarPeleHumana(BufferedImage img){
         
         BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
@@ -69,12 +212,14 @@ public class ProcessamentoImagem {
         return res;
     } 
     
-    //Normalizacao em níveis de cinza para a imagem
+    // Normalizacao em níveis de cinza para a imagem
     private static double normalizacao(double hist, double min_hist, double max_hist, double min_index, double max_index){
+        hist = Math.max(min_hist, Math.min(max_hist, hist));
         //A equação de normalização disposta no conteúdo teórico
         return (max_index - min_index)*(hist - min_hist)/(max_hist - min_hist) + min_index;
     }
     
+    // 
     public static BufferedImage BinarizacaoOtsu(BufferedImage img) {
 	
 	 //Cria a  imagem  de sai­da  
@@ -147,7 +292,7 @@ public class ProcessamentoImagem {
         }
     
         // Visualizacao do valor de limiar de Otsu  em modo Debug
-        System.out.println(uiLimiar);
+        // System.out.println(uiLimiar);
     
         //Cria a  imagem  binarizada 
 	//Aloca a Matriz
@@ -176,6 +321,8 @@ public class ProcessamentoImagem {
     return res;
 
 }
+    
+    // 
     public static BufferedImage EntropiaPun(BufferedImage img) {
 	
 	 //Cria a  imagem  de sai­da  
@@ -277,7 +424,7 @@ public class ProcessamentoImagem {
 	}   
         
         // Visualizacao do valor de limiar de Otsu  em modo Debug
-        System.out.println(uiLimiar);
+        // System.out.println(uiLimiar);
     
         //Cria a  imagem  binarizada 
 	//Aloca a Matriz
@@ -306,6 +453,7 @@ public class ProcessamentoImagem {
     return res;
 
 }
+    
     // Código de conversão  usando sRGB e não diretamente RGB
     private static double[] RGBtoLab(BufferedImage img, int image_x, int image_y){ 
 
@@ -365,5 +513,130 @@ public class ProcessamentoImagem {
         pSaida[2] = b_lab; 
         
         return pSaida;
-    }     
+    }
+    
+    public static BufferedImage EntropiaJohannsen(BufferedImage img){
+        //Cria a  imagem  de sai­da  
+        // Aloca a Matriz da imagem  de sai­da  
+        BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+        //Armazenando o tamanho da imagem
+        int Largura = img.getWidth();    // Largura da imagem
+        int Altura = img.getHeight();    // Altura da imagem
+        int col, lin, i, cinza;
+        double totalPixel = (double) Largura*Altura;
+        double [] proba = new double[256];
+        int [] histogram = new int[256];
+        double [] sb = new double[256];
+        double [] sw = new double[256];
+        double [] tl = new double[256];
+        int t;
+        double sum1;
+        double sum2;
+        double minimo;
+        
+        // Inicializacao variaveis
+   	int k, uiLimiar;        
+        // inicializacao do Histograma
+        for(i = 0; i < 256; i++) histogram[i]= 0;
+        
+        // Passo 1: calculo do Histograma  
+	for( lin = 0; lin < Altura; lin++) {
+            for( col = 0; col < Largura; col++) {
+                Color x = new Color(img.getRGB(col,lin)); // leitura dos canais RGB de cada pixel
+                // caso a imagem for colorida, gera uma imagem em ní­veis de cinza = (R+G+B)/3
+                cinza = (int)((x.getGreen() + x.getRed() + x.getBlue())/3);		
+                histogram[cinza]++; // Atualiza o histograma dos nÃ­veis de cinza (entre 0 e 255)
+            }
+	}
+        
+        //Passo 2: calculo das probabilidades a priori
+        for (i = 0; i < 256; i++) {
+            proba[i] = (double) ((histogram[i])/(double)(totalPixel));
+            sb[i] = 0;
+            sw[i] = 0;
+            tl[i] = 0;
+        }
+        
+        for (t = 0; t<256; t++) {
+            sum1 = 0;
+            sum2 = 0;
+            
+            for (int g=0; g<=t;g++) {
+                sum1 = sum1 + proba[g];
+            }
+            for(int g=0;g<=t-1;g++) {
+                sum2 = sum2 + proba[g];
+            }
+            
+            if ((proba[t] != 0) && (sum1 != 0) && (sum2 != 0)) {
+                sb[t] = (Math.log10((double)sum1)) - (1.0/sum1)*((proba[t]*Math.log10((double)proba[t]))) + (sum2*Math.log10((double)sum2));
+            }
+        }
+        
+        for (t = 0; t<256; t++) {
+            sum1 = 0;
+            sum2 = 0;
+            
+            for (int g = t; g < 256; g++) {
+                sum1 = sum1 + proba[g];
+            }
+            for(int g = t+1; g < 256; g++) {
+                sum2 = sum2 + proba[g];
+            }
+            
+            if ((proba[t] != 0) && (sum1 != 0) && (sum2 != 0)) {
+                sw[t] = (Math.log10((double)sum1)) - (1.0/sum1)*((proba[t]*Math.log10((double)proba[t]))) + (sum2*Math.log10((double)sum2));
+            }           
+        }
+        // Calculo do Limiar de Johannsen
+        for (int g = 0;g < 256; g++)
+        {
+            if ( (sb[g] != 0) && (sw[g] != 0) )
+                tl[g] = sb[g] + sw[g];
+        }
+
+        int m=0;
+        while(tl[m] == 0.0) {
+            m++;
+        }
+        minimo = tl[m];
+        uiLimiar = m;
+        
+        for(int g=m+1;g<256;g++) {
+            if ( (tl[g] != 0) && (tl[g] < minimo) )
+            {
+                minimo = tl[g];
+                 uiLimiar = g;
+            }
+	}
+
+        // Visualizacao do valor de limiar de Otsu  em modo Debug
+        System.out.println(uiLimiar);
+        //Cria a  imagem  binarizada 
+        //Aloca a Matriz
+        int [][] pBufferbinario = new int[Altura][Largura]; //Cria um PONTEIRO para a  imagem  binarizada 
+
+        for( lin = 0; lin < Altura; lin++) {
+            for( col = 0; col < Largura; col++) {
+                Color x = new Color(img.getRGB(col,lin)); // leitura dos canais RGB de cada pixel
+                // caso a imagem for colorida, gera uma imagem em ni­veis de cinza = (R+G+B)/3
+                cinza = (int)((x.getGreen() + x.getRed() + x.getBlue())/3);
+                    
+                if (cinza < uiLimiar)   pBufferbinario[lin][col] = 0;
+                else pBufferbinario[lin][col] = 1;  //multiplicado depois por 255
+            }
+	}
+
+        //Aqui Gera a  imagem binaria 
+        for(lin = 0; lin < Altura; lin++) {
+            for(col = 0; col < Largura; col++) {
+                int atual = pBufferbinario[lin][col]* 255; //multiplicacao da img binaria por 255
+                Color novo = new Color(atual, atual, atual);
+                res.setRGB(col,lin, novo.getRGB()); // gravacao do valor binarizado para cada pixel
+            }
+        }
+
+        return res;
+        
+    }
 }
