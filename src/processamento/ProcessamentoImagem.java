@@ -82,6 +82,7 @@ public class ProcessamentoImagem {
     
     // 
     public static BufferedImage rednessDetection2(BufferedImage originalImage) {
+        
         int width = originalImage.getWidth();
         int height = originalImage.getHeight();
 
@@ -155,6 +156,35 @@ public class ProcessamentoImagem {
                 }
                 
                 res.setRGB(i, j, (int) ((intensidadeNormalizada > pixelNormalized ? intensidadeNormalizada : pixelNormalized) * 255));
+            }
+        }
+        
+        return res;
+    }
+
+    //
+    public static BufferedImage finalDetection(BufferedImage img){
+        
+        BufferedImage res = img;
+        int width = img.getWidth();
+        int height = img.getHeight();
+        
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int rgb = img.getRGB(x, y);
+
+                // Extrai os componentes de cor
+                int red = (rgb >> 16) & 0xFF;
+                int green = (rgb >> 8) & 0xFF;
+                int blue = rgb & 0xFF;
+
+                // Verifica se a cor é vermelha
+                if (red > 150 && green < 100 && blue < 100) {
+                    //int newRgb = (red << 16) | (green << 8) | blue;
+                    //res.setRGB(x, y, newRgb);
+                } else {
+                    res.setRGB(x, y, 0xFFFFFF);
+                }
             }
         }
         
@@ -515,6 +545,7 @@ public class ProcessamentoImagem {
         return pSaida;
     }
     
+    //
     public static BufferedImage EntropiaJohannsen(BufferedImage img){
         //Cria a  imagem  de sai­da  
         // Aloca a Matriz da imagem  de sai­da  
