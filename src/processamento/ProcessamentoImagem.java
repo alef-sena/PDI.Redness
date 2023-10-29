@@ -63,13 +63,6 @@ public class ProcessamentoImagem {
             for (int j = 0; j < img.getHeight(); j++) {
                 int corNorm = res.getRGB(i, j);
                 double intensidade = (corNorm >> 16) & 0xFF;
-        
-                /*intensidade = normalizacao(intensidade, menorCol * 255, maiorCol * 255, 0, 255);
-                //System.out.println(intensidade);
-                //Color novoPixel = new Color((float)intensidade, (float)intensidade, (float)intensidade);
-                //res.setRGB(i, j, novoPixel.getRGB());*/
-                
-                
                 double cor_norm = normalizacao(intensidade, menorCol * 255, maiorCol * 255, 0, 255);
                 //System.out.println(cor_norm);
                 Color atual = new Color((int) cor_norm, (int) cor_norm, (int) cor_norm);
@@ -88,24 +81,17 @@ public class ProcessamentoImagem {
 
         BufferedImage res = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int rgb = originalImage.getRGB(x, y);
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
 
-                // Extrai os componentes de cor
+                int rgb = originalImage.getRGB(i, j);
                 int red = (rgb >> 16) & 0xFF;
-                int green = (rgb >> 8) & 0xFF;
-                int blue = rgb & 0xFF;
 
-                // Verifica se a cor é vermelha
-                if (red > 150 && green < 100 && blue < 100) {
-                    // Converte para cinza
-                    int grayValue = (red + green + blue) / 3;
-                    int newRgb = (grayValue << 16) | (grayValue << 8) | grayValue;
-                    res.setRGB(x, y, newRgb);
-                } else {
-                    res.setRGB(x, y, 0x000000);
-                }
+                int grayValue = red;
+
+                int grayPixel = (grayValue << 16) | (grayValue << 8) | grayValue;
+
+                res.setRGB(i, j, grayPixel);
             }
         }
 
@@ -138,22 +124,14 @@ public class ProcessamentoImagem {
                 }
                 
                 // Algoritmo 2 - Transformar a imagem para níveis de cinza
-                double pixelNormalized;
                 int rgb = img.getRGB(i, j);
-
-                // Extrai os componentes de cor
                 int red = (rgb >> 16) & 0xFF;
-                int green = (rgb >> 8) & 0xFF;
-                int blue = rgb & 0xFF;
-
-                // Verifica se a cor é vermelha
-                if (red > 150 && green < 100 && blue < 100) {
-                    // Converte para cinza
-                    int grayValue = (red + green + blue) / 3;
-                    pixelNormalized = (double) grayValue / 255.0;
-                } else {
-                    pixelNormalized = 0.0;
-                }
+                
+                int grayValue = red;
+                
+                int grayPixel = (grayValue << 16) | (grayValue << 8) | grayValue;
+                
+                double pixelNormalized = (double) grayPixel / 255.0;
                 
                 res.setRGB(i, j, (int) ((intensidadeNormalizada > pixelNormalized ? intensidadeNormalizada : pixelNormalized) * 255));
             }
@@ -173,12 +151,10 @@ public class ProcessamentoImagem {
             for (int y = 0; y < height; y++) {
                 int rgb = img.getRGB(x, y);
 
-                // Extrai os componentes de cor
                 int red = (rgb >> 16) & 0xFF;
                 int green = (rgb >> 8) & 0xFF;
                 int blue = rgb & 0xFF;
 
-                // Verifica se a cor é vermelha
                 if (red > 150 && green < 100 && blue < 100) {
                     //int newRgb = (red << 16) | (green << 8) | blue;
                     //res.setRGB(x, y, newRgb);
