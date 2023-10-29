@@ -35,6 +35,7 @@ public class ProcessamentoImagem {
         for (int i = 0; i < img.getWidth(); i++) {
             for (int j = 0; j < img.getHeight(); j++) {
                 Color pixelColor = new Color(img.getRGB(i, j));
+                
 
                 int canalVermelho = pixelColor.getRed();
                 int canalVerde = pixelColor.getGreen();
@@ -143,28 +144,159 @@ public class ProcessamentoImagem {
     //
     public static BufferedImage finalDetection(BufferedImage img){
         
-        BufferedImage res = img;
+        BufferedImage initialRedness = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+        BufferedImage finalImage = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+
         int width = img.getWidth();
         int height = img.getHeight();
         
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int rgb = img.getRGB(x, y);
+        double maiorCol = -Double.MAX_VALUE;
+        double menorCol = Double.MAX_VALUE;
+        
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                
+                Color pixelColor = new Color(img.getRGB(i, j));
 
-                int red = (rgb >> 16) & 0xFF;
-                int green = (rgb >> 8) & 0xFF;
-                int blue = rgb & 0xFF;
+                int canalVermelho = pixelColor.getRed();
+                int canalVerde = pixelColor.getGreen();
+                int canalAzul = pixelColor.getBlue();
 
-                if (red > 150 && green < 100 && blue < 100) {
-                    //int newRgb = (red << 16) | (green << 8) | blue;
-                    //res.setRGB(x, y, newRgb);
-                } else {
-                    res.setRGB(x, y, 0xFFFFFF);
+                double intensidadeVermelha = canalVermelho - 0.5 * canalVerde - 0.5 * canalAzul;
+                double intensidadeNormalizada = (intensidadeVermelha - (-255.0)) / (255.0 - (-255.0));
+
+                if (intensidadeNormalizada > 1.0) {
+                    intensidadeNormalizada = 1.0;
+                } else if (intensidadeNormalizada < 0.0) {
+                    intensidadeNormalizada = 0.0;
                 }
+
+                int corNorm = (int) (intensidadeNormalizada * 255);
+
+                Color novoPixel = new Color(corNorm, corNorm, corNorm);
+                initialRedness.setRGB(i, j, novoPixel.getRGB());
+
+                if (intensidadeNormalizada > maiorCol) maiorCol = intensidadeNormalizada;
+                if (intensidadeNormalizada < menorCol) menorCol = intensidadeNormalizada;
             }
         }
         
-        return res;
+        for (int a = 0; a < img.getWidth(); a++) {
+            for (int b = 0; b < img.getHeight(); b++) {
+                int normalizedColor = img.getRGB(a, b);
+                double intensidade = (normalizedColor >> 16) & 0xFF;
+                double cor_norm = normalizacao(intensidade, menorCol * 255, maiorCol * 255, 0, 255);
+                //System.out.println(cor_norm);
+                Color atual = new Color((int) cor_norm, (int) cor_norm, (int) cor_norm);
+                //System.out.println("Normalizando: " + atual.getRGB());
+                initialRedness.setRGB(a, b, atual.getRGB());
+            }
+        }
+        
+        // aqui eu tenho initialRedness nivel de cinza
+        
+                // Binarizacao
+        //Armazenando o tamanho da imagem
+        int Largura = initialRedness.getWidth();    // Largura da imagem
+        int Altura = initialRedness.getHeight();    // Altura da imagem
+        int col, lin, c, cinza;
+        double totalPixel = (double) Largura*Altura;
+        double [] proba = new double[256];
+        int [] histogram = new int[256];
+
+        // Inicializacao variaveis
+        int k, uiLimiar;        
+        // inicializacao do Histograma
+        for(c = 0; c < 256; c++) histogram[c]= 0;
+
+        // Passo 1: calculo do Histograma  
+        for( lin = 0; lin < Altura; lin++) {
+            for( col = 0; col < Largura; col++) {
+                Color x = new Color(initialRedness.getRGB(col,lin)); // leitura dos canais RGB de cada pixel
+                // caso a imagem for colorida, gera uma imagem em ní­veis de cinza = (R+G+B)/3
+                cinza = (int)((x.getGreen() + x.getRed() + x.getBlue())/3);		
+                histogram[cinza]++; // Atualiza o histograma dos nÃ­veis de cinza (entre 0 e 255)
+            }
+        }
+
+        // Alocacao das Matrizes
+        double fSigmaBMax, fMiTotal;
+        double [] fOmega = new double[256], fMi = new double[256] , fSigmaB = new double[256];
+
+        //Passo 2: calculo das probabilidades a priori
+        for (c = 0; c < 256; c++) {
+                proba[c] = (double) ((histogram[c])/(double)(totalPixel));
+                fOmega[c] = fMi[c] = 0.0;
+        }  
+
+        for (k = 0; k < 256; k++){
+            for (c = 0; c < k; c++)   fOmega[k] += proba[c];
+        }
+
+        for (k = 0; k < 256; k++){
+            for (c = 0; c < k; c++)   fMi[k] += (c + 1) * proba[c];
+        }                    
+
+        fMiTotal = fSigmaBMax = 0.0;  
+        uiLimiar = 128; //inicializacao do valor de limiar  de Otsu
+
+        for (c = 0; c < 256; c++)       fMiTotal += (c + 1) * proba[c];
+
+        // calculo de fSigmaBMax para 1o ni­vel de cinza = 0 
+        if ((fOmega[0] * (1 - fOmega[0])) != 0.0) {
+                // calculo do criterio de binarizacao da tecnica de Otsu 
+                fSigmaBMax = (  (fMiTotal * fOmega[0] - fMi[0]) * (fMiTotal * fOmega[0] - fMi[0]) ) / (fOmega[0] * (1 - fOmega[0]));
+                uiLimiar = 0;
+        }
+
+        // calculo de fSigmaBMax para os outros ni­veis de cinza (entre 1 e 255)
+        for (k = 1; k < 256; k++) {
+            if ((fOmega[k] * (1 - fOmega[k])) != 0.0){
+                // Busca do valor de limiar = valor de ni­vel de cinza que corresponde ao maior valor de fSigmaBMax (criterio da tecnica de Otsu )
+                fSigmaB[k] = (  (fMiTotal * fOmega[k] - fMi[k]) * (fMiTotal * fOmega[k] - fMi[k]) ) / (fOmega[k] * (1 - fOmega[k]));
+                if (fSigmaB[k] > fSigmaBMax){
+                    fSigmaBMax = fSigmaB[k];
+                    uiLimiar = (int) k;
+                }
+            }
+        }
+
+        // Visualizacao do valor de limiar de Otsu  em modo Debug
+        // System.out.println(uiLimiar);
+
+        //Cria a  imagem  binarizada 
+        //Aloca a Matriz
+        int [][] pBufferbinario = new int[Altura][Largura]; //Cria um PONTEIRO para a  imagem  binarizada
+
+        for( lin = 0; lin < Altura; lin++) {
+            for( col = 0; col < Largura; col++) {
+
+                Color x = new Color(initialRedness.getRGB(col,lin)); // leitura dos canais RGB de cada pixel
+                
+                int rgb = img.getRGB(col, lin);
+                int red = (rgb >> 16) & 0xFF;
+                int green = (rgb >> 8) & 0xFF;
+                int blue = rgb & 0xFF;
+                
+                Color pixelColor = new Color(img.getRGB(col, lin));
+                //Color pixelColor = new Color(img.getRGB(col, lin));
+
+                // caso a imagem for colorida, gera uma imagem em ni­veis de cinza = (R+G+B)/3
+                cinza = (int)((x.getGreen() + x.getRed() + x.getBlue())/3);
+
+                if (cinza < uiLimiar){
+                    pBufferbinario[lin][col] = 0;
+                }
+                else{
+                    pixelColor = new Color(255, 255, 255);
+                    pBufferbinario[lin][col] = 1;
+                }  //multiplicado depois por 255
+                //System.out.println(pixel.getRGB());
+                finalImage.setRGB(col, lin, pixelColor.getRGB());
+            }
+        }
+                
+        return finalImage;
     }
 
     // 
@@ -199,7 +331,6 @@ public class ProcessamentoImagem {
                 if(cirg2 > maior_col) maior_col = cirg2;
                 if(cirg2 < menor_col) menor_col = cirg2;
                 vet_col[i][j] = cirg2;
-                
             }
         }
         
