@@ -274,25 +274,29 @@ public class ProcessamentoImagem {
                 Color x = new Color(initialRedness.getRGB(col,lin)); // leitura dos canais RGB de cada pixel
                 
                 int rgb = img.getRGB(col, lin);
+                
                 int red = (rgb >> 16) & 0xFF;
                 int green = (rgb >> 8) & 0xFF;
                 int blue = rgb & 0xFF;
                 
-                Color pixelColor = new Color(img.getRGB(col, lin));
+                Color pixelColor = new Color(255, 0, 0);
                 //Color pixelColor = new Color(img.getRGB(col, lin));
 
                 // caso a imagem for colorida, gera uma imagem em ni­veis de cinza = (R+G+B)/3
                 cinza = (int)((x.getGreen() + x.getRed() + x.getBlue())/3);
 
-                if (cinza < uiLimiar){
+                if (cinza <= uiLimiar){
+                    //finalImage.setRGB(col, lin, 255);
+                    rgb = (red << 16) | (green << 8) | blue;
                     pBufferbinario[lin][col] = 0;
                 }
                 else{
-                    pixelColor = new Color(255, 255, 255);
+                    //pixelColor = new Color(255);
+                    rgb = 0xFFFFFF;
                     pBufferbinario[lin][col] = 1;
                 }  //multiplicado depois por 255
-                //System.out.println(pixel.getRGB());
-                finalImage.setRGB(col, lin, pixelColor.getRGB());
+                //finalImage.setRGB(col, lin, pixelColor.getRGB());
+                finalImage.setRGB(col, lin, rgb);
             }
         }
                 
@@ -309,7 +313,7 @@ public class ProcessamentoImagem {
         double maior_col = -Double.MAX_VALUE, menor_col = Double.MAX_VALUE;     //Valores que armazenarão a maior e a menor intensidade da imagem
         
         //Busca pelo índice de vermelhidão segundo a fórmula correspondente à medição de cor dos tomates
-	for (int i = 0; i < img.getWidth(); i++) {
+	    for (int i = 0; i < img.getWidth(); i++) {
             for (int j = 0; j < img.getHeight(); j++) {
                 
                 //Vetor para o armazenamento das informações provenientes da conversão de RGB para L*a*b*
@@ -359,9 +363,9 @@ public class ProcessamentoImagem {
     // 
     public static BufferedImage BinarizacaoOtsu(BufferedImage img) {
 	
-	 //Cria a  imagem  de sai­da  
-	// Aloca a Matriz da imagem  de sai­da  
-	BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+	    //Cria a  imagem  de sai­da  
+	    // Aloca a Matriz da imagem  de sai­da  
+	    BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
 
         //Armazenando o tamanho da imagem
         int Largura = img.getWidth();    // Largura da imagem
@@ -372,19 +376,19 @@ public class ProcessamentoImagem {
         int [] histogram = new int[256];
 
         // Inicializacao variaveis
-   	int k, uiLimiar;        
+   	    int k, uiLimiar;        
         // inicializacao do Histograma
         for(i = 0; i < 256; i++) histogram[i]= 0;
  
         // Passo 1: calculo do Histograma  
-	for( lin = 0; lin < Altura; lin++) {
+	    for( lin = 0; lin < Altura; lin++) {
             for( col = 0; col < Largura; col++) {
                 Color x = new Color(img.getRGB(col,lin)); // leitura dos canais RGB de cada pixel
-		// caso a imagem for colorida, gera uma imagem em ní­veis de cinza = (R+G+B)/3
-		cinza = (int)((x.getGreen() + x.getRed() + x.getBlue())/3);		
-		histogram[cinza]++; // Atualiza o histograma dos nÃ­veis de cinza (entre 0 e 255)
+                // caso a imagem for colorida, gera uma imagem em ní­veis de cinza = (R+G+B)/3
+                cinza = (int)((x.getGreen() + x.getRed() + x.getBlue())/3);		
+                histogram[cinza]++; // Atualiza o histograma dos nÃ­veis de cinza (entre 0 e 255)
             }
-	}
+	    }
         
         // Alocacao das Matrizes
         double fSigmaBMax, fMiTotal;
@@ -396,11 +400,11 @@ public class ProcessamentoImagem {
 		fOmega[i] = fMi[i] = 0.0;
         }  
  
-	for (k = 0; k < 256; k++){
+	    for (k = 0; k < 256; k++){
             for (i = 0; i < k; i++)   fOmega[k] += proba[i];
         }
 
-	for (k = 0; k < 256; k++){
+	    for (k = 0; k < 256; k++){
             for (i = 0; i < k; i++)   fMi[k] += (i + 1) * proba[i];
         }                    
   
@@ -432,8 +436,8 @@ public class ProcessamentoImagem {
         // System.out.println(uiLimiar);
     
         //Cria a  imagem  binarizada 
-	//Aloca a Matriz
-	int [][] pBufferbinario = new int[Altura][Largura]; //Cria um PONTEIRO para a  imagem  binarizada 
+        //Aloca a Matriz
+        int [][] pBufferbinario = new int[Altura][Largura]; //Cria um PONTEIRO para a  imagem  binarizada 
 
         for( lin = 0; lin < Altura; lin++) {
             for( col = 0; col < Largura; col++) {
@@ -444,15 +448,15 @@ public class ProcessamentoImagem {
 		if (cinza < uiLimiar)   pBufferbinario[lin][col] = 0;
 		else    pBufferbinario[lin][col] = 1;  //multiplicado depois por 255
             }
-	}
+	    }
 
         //Aqui Gera a  imagem binaria 
         for(lin = 0; lin < Altura; lin++) {
-		for(col = 0; col < Largura; col++) {
-                    int atual = pBufferbinario[lin][col]* 255; //multiplicacao da img binaria por 255
-                    Color novo = new Color(atual, atual, atual);
-                    res.setRGB(col,lin, novo.getRGB()); // gravacao do valor binarizado para cada pixel
-		}
+            for(col = 0; col < Largura; col++) {
+                int atual = pBufferbinario[lin][col]* 255; //multiplicacao da img binaria por 255
+                Color novo = new Color(atual, atual, atual);
+                res.setRGB(col,lin, novo.getRGB()); // gravacao do valor binarizado para cada pixel
+            }
         }
 
     return res;
