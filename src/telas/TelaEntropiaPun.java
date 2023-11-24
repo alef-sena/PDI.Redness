@@ -115,7 +115,7 @@ public class TelaEntropiaPun extends javax.swing.JFrame {
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("Selecione a pasta onde deseja salvar as imagens processadas:");
 
-        txtPastaDestino.setText("Selecione uma pasta de origem...");
+        txtPastaDestino.setText("Selecione uma pasta de destino...");
         txtPastaDestino.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtPastaDestinoActionPerformed(evt);

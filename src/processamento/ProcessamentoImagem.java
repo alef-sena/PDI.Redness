@@ -23,117 +23,71 @@ import javax.imageio.ImageIO;
  */
 public class ProcessamentoImagem {
     
-    // 
-    public static BufferedImage rednessDetection1(BufferedImage img) {
-        
-        // Carregar a imagem
-        BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-
-        double maiorCol = -Double.MAX_VALUE;
-        double menorCol = Double.MAX_VALUE;
-        
-        for (int i = 0; i < img.getWidth(); i++) {
-            for (int j = 0; j < img.getHeight(); j++) {
-                Color pixelColor = new Color(img.getRGB(i, j));
-
-                int canalVermelho = pixelColor.getRed();
-                int canalVerde = pixelColor.getGreen();
-                int canalAzul = pixelColor.getBlue();
-
-                double intensidadeVermelha = canalVermelho - 0.5 * canalVerde - 0.5 * canalAzul;
-                double intensidadeNormalizada = (intensidadeVermelha - (-255.0)) / (255.0 - (-255.0));
-
-                if (intensidadeNormalizada > 1.0) {
-                    intensidadeNormalizada = 1.0;
-                } else if (intensidadeNormalizada < 0.0) {
-                    intensidadeNormalizada = 0.0;
-                }
-                
-                int corNorm = (int) (intensidadeNormalizada * 255);
-
-                Color novoPixel = new Color(corNorm, corNorm, corNorm);
-                res.setRGB(i, j, novoPixel.getRGB());
-
-                if (intensidadeNormalizada > maiorCol) maiorCol = intensidadeNormalizada;
-                if (intensidadeNormalizada < menorCol) menorCol = intensidadeNormalizada;
-            }
-        }
-
-        for (int i = 0; i < img.getWidth(); i++) {
-            for (int j = 0; j < img.getHeight(); j++) {
-                int corNorm = res.getRGB(i, j);
-                double intensidade = (corNorm >> 16) & 0xFF;
-                double cor_norm = normalizacao(intensidade, menorCol * 255, maiorCol * 255, 0, 255);
-                //System.out.println(cor_norm);
-                Color atual = new Color((int) cor_norm, (int) cor_norm, (int) cor_norm);
-                res.setRGB(i, j, atual.getRGB());
-            }
-        }
-
-        return res;
-    }
-    
-    // 
-    public static BufferedImage rednessDetection2(BufferedImage originalImage) {
-        
-        int width = originalImage.getWidth();
-        int height = originalImage.getHeight();
-
-        BufferedImage res = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-
-                int rgb = originalImage.getRGB(i, j);
-                int red = (rgb >> 16) & 0xFF;
-
-                int grayValue = red;
-
-                int grayPixel = (grayValue << 16) | (grayValue << 8) | grayValue;
-
-                res.setRGB(i, j, grayPixel);
-            }
-        }
-
-        return res;
-    }
-    
     //
     public static BufferedImage rednessFusion(BufferedImage img) {
         
         BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-                
+        //Para realizar a análise de forma eficiente, precisa-se de um vetor para armazenar o índice de vermelhidao para cada pixel
+        double[][] vetColLuiz = new double[img.getWidth()][img.getHeight()];
+        double maiorColLuiz = -Double.MAX_VALUE, menorColLuiz = Double.MAX_VALUE;     //Valores que armazenarão a maior e a menor intensidade da imagem
+        
+        //Para realizar a análise de forma eficiente, precisa-se de um vetor para armazenar o índice de vermelhidao para cada pixel
+        double[][] vetColLuan = new double[img.getWidth()][img.getHeight()];
+        double maiorColLuan = -Double.MAX_VALUE, menorColLuan = Double.MAX_VALUE;     //Valores que armazenarão a maior e a menor intensidade da imagem
+        
         for (int i = 0; i < img.getWidth(); i++) {
             for (int j = 0; j < img.getHeight(); j++) {
                 
-                // Algoritmo 1 - Transformar a imagem para níveis de cinza
-                double intensidadeNormalizada;
-                Color pixelColor = new Color(img.getRGB(i, j));
+                //Algoritmo 1 - Luiz
+                //Vetor para o armazenamento das informações provenientes da conversão de RGB para L*a*b*
+                double[] Lab = new double[3];
+                Lab = RGBtoLabLuiz(img, i, j);
+                double L = Lab[0], a = Lab[1], b = Lab[2];
+                
+                //Obtenção do croma, característica do espaço de cores L*a*b*
+                double chroma = sqrt(pow(a, 2) + pow(b, 2));
+                
+                //Obtendo o h
+                double h = Math.atan(b/a);
+                double H = Math.toDegrees(h);
+                
+                //Índice de vermelhidão dos tomates, segundo a referência utilizada
+                double cirg2 = (180-H)/(L/chroma);
+                
+                //Encontrar a maior e a menor intensidades para a normalização
+                if(cirg2 > maiorColLuiz) maiorColLuiz = cirg2;
+                if(cirg2 < menorColLuiz) menorColLuiz = cirg2;
+                vetColLuiz[i][j] = cirg2;
+                
+                //Algoritmo 2 - Luan
+                //Vetor para o armazenamento das informações provenientes da conversão de RGB para L*a*b*
+                Lab = new double[3];
+                Lab = RGBtoLabLuan(img, i, j);
+                L = Lab[0];
+                a = Lab[1];
+                b = Lab[2];
+                
+                //Obtenção do croma, carqacterística do espaço de cores L*a*b*
+                chroma = sqrt(pow(a, 2) + pow(b, 2));
+                
+                h = Math.atan(b/a);
 
-                int canalVermelho = pixelColor.getRed();
-                int canalVerde = pixelColor.getGreen();
-                int canalAzul = pixelColor.getBlue();
-
-                double intensidadeVermelha = canalVermelho - 0.5 * canalVerde - 0.5 * canalAzul;
-                intensidadeNormalizada = (intensidadeVermelha - (-255.0)) / (255.0 - (-255.0));
-
-                if (intensidadeNormalizada > 1.0) {
-                    intensidadeNormalizada = 1.0;
-                } else if (intensidadeNormalizada < 0.0) {
-                    intensidadeNormalizada = 0.0;
-                }
+                H = Math.toDegrees(h);
                 
-                // Algoritmo 2 - Transformar a imagem para níveis de cinza
-                int rgb = img.getRGB(i, j);
-                int red = (rgb >> 16) & 0xFF;
+                //Índice de vermelhidão
+                double CIRG = (180 - H)/(L + chroma);
                 
-                int grayValue = red;
+                //Encontrar a maior e a menor intensidades para a normalização
+                if(CIRG > maiorColLuan) maiorColLuan = CIRG;
+                if(CIRG < menorColLuan) menorColLuan = CIRG;
+                vetColLuan[i][j] = CIRG;
                 
-                int grayPixel = (grayValue << 16) | (grayValue << 8) | grayValue;
+                double corNormLuiz = normalizacaoLuiz(vetColLuiz[i][j], menorColLuiz, maiorColLuiz, 0, 255);
+                double corNormLuan = normalizacaoLuan(vetColLuan[i][j], menorColLuan, maiorColLuan, 0, 255);
+                double max = corNormLuiz > corNormLuan ? corNormLuiz : corNormLuan;
                 
-                double pixelNormalized = (double) grayPixel / 255.0;
-                
-                res.setRGB(i, j, (int) ((intensidadeNormalizada > pixelNormalized ? intensidadeNormalizada : pixelNormalized) * 255));
+                Color atual = new Color((int) max, (int) max, (int) max);
+                res.setRGB(i, j, atual.getRGB());
             }
         }
         
@@ -141,26 +95,25 @@ public class ProcessamentoImagem {
     }
 
     //
-    public static BufferedImage finalDetection(BufferedImage img){
+    public static BufferedImage finalDetection(BufferedImage originalImg, BufferedImage binarizedImg){
         
-        BufferedImage res = img;
-        int width = img.getWidth();
-        int height = img.getHeight();
+        //BufferedImage res = new BufferedImage(originalImg.getWidth(), originalImg.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+        BufferedImage res = new BufferedImage(originalImg.getWidth(), originalImg.getHeight(), originalImg.getType());
         
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int rgb = img.getRGB(x, y);
-
-                int red = (rgb >> 16) & 0xFF;
-                int green = (rgb >> 8) & 0xFF;
-                int blue = rgb & 0xFF;
-
-                if (red > 150 && green < 100 && blue < 100) {
-                    //int newRgb = (red << 16) | (green << 8) | blue;
-                    //res.setRGB(x, y, newRgb);
-                } else {
-                    res.setRGB(x, y, 0xFFFFFF);
-                }
+        for (int i = 0; i < originalImg.getWidth(); i++) {
+            for (int j = 0; j < originalImg.getHeight(); j++) {
+                
+                
+                Color originalColor = new Color(originalImg.getRGB(i,j));
+                //System.out.println("R: " + originalColor.getRed() + " G: " + originalColor.getGreen() + " B: " + originalColor.getBlue());
+                Color binarizedColor = new Color(binarizedImg.getRGB(i, j));
+                //System.out.println("R: " + binarizedColor.getRed() + " G: " + binarizedColor.getGreen() + " B: " + binarizedColor.getBlue());
+                
+                Color newPixel = 
+                    Color.WHITE.hashCode() ==  binarizedColor.hashCode() ?
+                        new Color(originalColor.getRed(), originalColor.getGreen(), originalColor.getBlue()) :
+                        new Color(255,255,255);
+                res.setRGB(i, j, newPixel.getRGB());
             }
         }
         
@@ -168,7 +121,7 @@ public class ProcessamentoImagem {
     }
 
     // 
-    public static BufferedImage detectarPeleHumana(BufferedImage img){
+    public static BufferedImage detectarPeleHumanaLuiz(BufferedImage img){
         
         BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
 	
@@ -182,7 +135,7 @@ public class ProcessamentoImagem {
                 
                 //Vetor para o armazenamento das informações provenientes da conversão de RGB para L*a*b*
                 double[] Lab = new double[3];
-                Lab = RGBtoLab(img, i, j);
+                Lab = RGBtoLabLuiz(img, i, j);
                 double L = Lab[0], a = Lab[1], b = Lab[2];
                 
                 //Obtenção do croma, característica do espaço de cores L*a*b*
@@ -207,7 +160,7 @@ public class ProcessamentoImagem {
         for (int i = 0; i < img.getWidth(); i++) {
             for (int j = 0; j < img.getHeight(); j++) {
                 
-                double cor_norm = normalizacao(vet_col[i][j], menor_col, maior_col, 0, 255);
+                double cor_norm = normalizacaoLuiz(vet_col[i][j], menor_col, maior_col, 0, 255);
                 Color atual = new Color((int) cor_norm, (int) cor_norm, (int) cor_norm);
                 res.setRGB(i, j, atual.getRGB());
                 
@@ -218,9 +171,65 @@ public class ProcessamentoImagem {
         return res;
     } 
     
+    //
+    public static BufferedImage detectarPeleHumanaLuan(BufferedImage img){
+        
+        BufferedImage res = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+	
+        //Para realizar a análise de forma eficiente, precisa-se de um vetor para armazenar o índice de vermelhidao para cada pixel
+        double[][] vet_col = new double[img.getWidth()][img.getHeight()];
+        double maior_col = -Double.MAX_VALUE, menor_col = Double.MAX_VALUE;     //Valores que armazenarão a maior e a menor intensidade da imagem
+        
+        //Busca pelo índice de vermelhidão segundo a fórmula correspondente à medição de cor dos tomates
+	for (int i = 0; i < img.getWidth(); i++) {
+            for (int j = 0; j < img.getHeight(); j++) {
+                
+                //Vetor para o armazenamento das informações provenientes da conversão de RGB para L*a*b*
+                double[] Lab = new double[3];
+                Lab = RGBtoLabLuan(img, i, j);
+                double L = Lab[0], a = Lab[1], b = Lab[2];
+                
+                //Obtenção do croma, carqacterística do espaço de cores L*a*b*
+                double chroma = sqrt(pow(a, 2) + pow(b, 2));
+                
+                double h = Math.atan(b/a);
+
+                double H = Math.toDegrees(h);
+                
+                //Índice de vermelhidão
+                double CIRG = (180 - H)/(L + chroma);
+                
+                //Encontrar a maior e a menor intensidades para a normalização
+                if(CIRG > maior_col) maior_col = CIRG;
+                if(CIRG < menor_col) menor_col = CIRG;
+                vet_col[i][j] = CIRG;
+                
+            }
+        }
+        
+        //Geração da nova imagem após normalização em níveis de cinza
+        for (int i = 0; i < img.getWidth(); i++) {
+            for (int j = 0; j < img.getHeight(); j++) {
+                
+                double cor_norm = normalizacaoLuan(vet_col[i][j], menor_col, maior_col, 0, 255);
+                Color atual = new Color((int) cor_norm, (int) cor_norm, (int) cor_norm);
+                res.setRGB(i, j, atual.getRGB());
+                
+            }
+        }
+        
+        //A imagem após análise e medição de vermelhidão
+        return res;
+    }
+    
     // Normalizacao em níveis de cinza para a imagem
-    private static double normalizacao(double hist, double min_hist, double max_hist, double min_index, double max_index){
-        hist = Math.max(min_hist, Math.min(max_hist, hist));
+    private static double normalizacaoLuiz(double hist, double min_hist, double max_hist, double min_index, double max_index){
+        //A equação de normalização disposta no conteúdo teórico
+        return (max_index - min_index)*(hist - min_hist)/(max_hist - min_hist) + min_index;
+    }
+    
+    //
+    private static double normalizacaoLuan(double hist, double min_hist, double max_hist, double min_index, double max_index){
         //A equação de normalização disposta no conteúdo teórico
         return (max_index - min_index)*(hist - min_hist)/(max_hist - min_hist) + min_index;
     }
@@ -461,7 +470,68 @@ public class ProcessamentoImagem {
 }
     
     // Código de conversão  usando sRGB e não diretamente RGB
-    private static double[] RGBtoLab(BufferedImage img, int image_x, int image_y){ 
+    private static double[] RGBtoLabLuiz(BufferedImage img, int image_x, int image_y){ 
+
+        // exemplo de alocacao de vetor contendo as variáveis do espaço de cor Lab
+        double[] pSaida = new double[3]; //Cria um PONTEIRO para armazenar cálculos
+        
+        Color orig = new Color(img.getRGB(image_x, image_y));  // lendo o valor RGB do pixel(i,j)
+				
+	// Conventendo RGB para sRGB - normalizando entre 0 e 1 
+	// convert 0..255 into 0..1 
+	double r = orig.getRed() / 255.0; 
+        double g = orig.getGreen() /255.0;
+	double b = orig.getBlue() / 255.0; 
+
+	// Usando sRGB 
+	if (r <= 0.04045)  r = r / 12.92; 
+	else  r = Math.pow(((r + 0.055) / 1.055), 2.4); 
+			
+	if (g <= 0.04045) 	   g = g / 12.92; 
+	else 	   g = Math.pow(((g + 0.055) / 1.055), 2.4); 
+
+	if (b <= 0.04045) 	   b = b / 12.92; 
+	else   b = Math.pow(((b + 0.055) / 1.055), 2.4); 
+
+	r *= 100.0; // normalizando entre 0 e 100
+        g *= 100.0; // normalizando entre 0 e 100
+	b *= 100.0; // normalizando entre 0 e 100
+
+        //Conversão de sRGB para Espaço de cor XYZ
+        double Xx = r * 0.412424 + g * 0.357579 + b * 0.180464;
+        double Yx = r * 0.212656 + g * 0.715158 + b * 0.0721856;
+        double Zx = r * 0.0193324 + g * 0.119193 + b * 0.950444;
+
+        //Conversão de XYZ para L* a* b* CORRIGIDO usando sRGB antes 
+	// Usando Observer. = 2°, Illuminant = D65
+	// D65 = {95.047, 100.000, 108.883};
+	double x = Xx / 95.047; 
+	double y = Yx / 100; 
+	double z = Zx / 108.883; 
+
+	if (x > 0.008856)    	x = Math.pow(x, 1.0/3.0);  
+	else 	   				x = (7.787 * x) + (16.0/116.0); 
+				 
+	if (y > 0.008856) 	  	y = Math.pow(y, 1.0/3.0); 
+	else 				  	y = (7.787 * y) + (16.0/116.0); 
+
+	if (z > 0.008856) 	   z = Math.pow(z, 1.0/3.0); 
+	else 				   z = (7.787 * z) + (16.0/116.0);  
+
+	double L = (116.0 * y) - 16.0; 
+	double a = 500.0 * (x - y); 
+	double b_lab = 200.0 * (y - z); 
+                
+	//O retorno de cada indice do espaço de cores Lab para cada pixel da imagem dada
+        pSaida[0] = L; 
+        pSaida[1] = a; 
+        pSaida[2] = b_lab; 
+        
+        return pSaida;
+    }
+    
+    //
+    private static double[] RGBtoLabLuan(BufferedImage img, int image_x, int image_y){ 
 
         // exemplo de alocacao de vetor contendo as variáveis do espaço de cor Lab
         double[] pSaida = new double[3]; //Cria um PONTEIRO para armazenar cálculos
