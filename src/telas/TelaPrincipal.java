@@ -26,6 +26,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     
     public File arqImagemOriginal;
     public BufferedImage imagemAtual;
+    public BufferedImage imagemOriginal;
     public boolean imagemFoiCarregada;
 
     /**
@@ -346,6 +347,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
             try {
                 arqImagemOriginal = fs.getSelectedFile();
                 imagemAtual = ImageIO.read(arqImagemOriginal);
+                imagemOriginal = ImageIO.read(arqImagemOriginal);
                 jLabel1.setIcon(new javax.swing.ImageIcon(imagemAtual));
                 imagemFoiCarregada = true;
             } catch (IOException ex) {
@@ -458,7 +460,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         JFrame f=new JFrame();
         if(imagemFoiCarregada){
             try{
-                BufferedImage imagemPosterizada = ProcessamentoImagem.rednessDetection1(imagemAtual);
+                BufferedImage imagemPosterizada = ProcessamentoImagem.detectarPeleHumanaLuiz(imagemAtual);
                 if(imagemPosterizada == null) {
                     JOptionPane.showMessageDialog(f, "Não foi possível realizar a posterizacão!", "Aviso", JOptionPane.WARNING_MESSAGE);
                 }else{
@@ -484,7 +486,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         JFrame f=new JFrame();
         if(imagemFoiCarregada){
             try{
-                BufferedImage imagemPosterizada = ProcessamentoImagem.rednessDetection2(imagemAtual);
+                BufferedImage imagemPosterizada = ProcessamentoImagem.detectarPeleHumanaLuan(imagemAtual);
                 if(imagemPosterizada == null) {
                     JOptionPane.showMessageDialog(f, "Não foi possível realizar a posterizacão!", "Aviso", JOptionPane.WARNING_MESSAGE);
                 }else{
@@ -536,7 +538,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         JFrame f=new JFrame();
         if(imagemFoiCarregada){
             try{
-                BufferedImage imagemPosterizada = ProcessamentoImagem.finalDetection(imagemAtual);
+                BufferedImage imagemPosterizada = ProcessamentoImagem.finalDetection(imagemOriginal, imagemAtual);
                 if(imagemPosterizada == null) {
                     JOptionPane.showMessageDialog(f, "Não foi possível realizar a posterizacão!", "Aviso", JOptionPane.WARNING_MESSAGE);
                 }else{

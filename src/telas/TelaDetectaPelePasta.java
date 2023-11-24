@@ -280,7 +280,7 @@ public class TelaDetectaPelePasta extends javax.swing.JFrame {
                         {
                             try {
                                 BufferedImage imgOriginal = ImageIO.read(arqPastaOrigem);
-                                BufferedImage imagemProcessada = ProcessamentoImagem.detectarPeleHumana(imgOriginal);
+                                BufferedImage imagemProcessada = ProcessamentoImagem.detectarPeleHumanaLuiz(imgOriginal);
                                 File fo = new File(pastaDestino.getPath()+"/"+arqPastaOrigem.getName().substring(0, arqPastaOrigem.getName().length() - 4)+"_RedCIRG2"+".png");
                                 ImageIO.write(imagemProcessada, "png", fo);
                                 numImgsProcessadas++;                                
